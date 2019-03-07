@@ -9,4 +9,6 @@ Legend for folder names can be found in `Img_Notes.xlsx`. This file also include
 Corresponding clean script and data goes into correspondingly names folders in the `clean.data` folder.
 
 Note: Complete or in progress custom functions can be found on the `main.R` file.
+
+[] refers to problems I am still tackling.
   
