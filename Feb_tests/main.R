@@ -13,6 +13,10 @@ working.dir <- getwd()
 install.packages("Thermimage")
 #call thermimage library
 library(Thermimage)
+#set the path for where exiftool exists
+exiftool.p <- paste("/usr", "local", "bin/", sep = "/")
+#check it works
+system2(paste(exiftool.p, "exiftool", sep = "/"))
 
 install.packages("imager")
 library(imager)
@@ -59,52 +63,52 @@ p.ana <- p.final[3]
 
 f.rename <- function(dir.path, prefix) {
   
-#start by generating the list of file names
-image.names <- c(list.files(dir.path))
-
-#create the file names into paths
-for(i in 1:length(image.names)) {
-  image.names[i] <- c(paste(dir.path, "/", 
-                            image.names[i] , sep = ""))
+  #start by generating the list of file names
+  image.names <- c(list.files(dir.path))
   
-}
-
-#create a list of numbers the same as # of files to replace
-image.number.list <- c(rep("NA", length(image.names)))
-
-#paste that into a path and file names
-for(i in 1:length(image.names)) {
+  #create the file names into paths
+  for(i in 1:length(image.names)) {
+    image.names[i] <- c(paste(dir.path, "/", 
+                              image.names[i] , sep = ""))
+    
+  }
   
-  image.number.list[i] <- paste(dir.path , "/" , prefix , "_000", i, 
-                                ".jpg", sep = "")
-   if(i > 9) 
-  (image.number.list[i] <- paste(dir.path , "/" , prefix , "_00", i, 
-                                ".jpg", sep = ""))
-  if(i > 99)
-    (image.number.list[i] <- paste(dir.path , "/" , prefix , "_0", i, 
-                                   ".jpg", sep = ""))
+  #create a list of numbers the same as # of files to replace
+  image.number.list <- c(rep("NA", length(image.names)))
   
-  if(i > 999)
-    (image.number.list[i] <- paste(dir.path , "/" , prefix , "_", i, 
-                                   ".jpg", sep = ""))
-}
-
-
-#now for every existing file name rename it with the simpler title
-for(i in 1:length(image.names)) {
-  file.rename(image.names[i], image.number.list[i])
-}
-
+  #paste that into a path and file names
+  for(i in 1:length(image.names)) {
+    
+    image.number.list[i] <- paste(dir.path , "/" , prefix , "_000", i, 
+                                  ".jpg", sep = "")
+    if(i > 9) 
+      (image.number.list[i] <- paste(dir.path , "/" , prefix , "_00", i, 
+                                     ".jpg", sep = ""))
+    if(i > 99)
+      (image.number.list[i] <- paste(dir.path , "/" , prefix , "_0", i, 
+                                     ".jpg", sep = ""))
+    
+    if(i > 999)
+      (image.number.list[i] <- paste(dir.path , "/" , prefix , "_", i, 
+                                     ".jpg", sep = ""))
+  }
+  
+  
+  #now for every existing file name rename it with the simpler title
+  for(i in 1:length(image.names)) {
+    file.rename(image.names[i], image.number.list[i])
+  }
+  
 }
 
 f.rename(paste(p.raw, "test", sep = ""), "IR")
 
 
 #input must be f.rename(pathname, "prefix")
-  #path name = e.x.: paste(p.raw, "f28.ftrial2", "/" , "E60" , sep = "")
-    #should call folder in which files are placed
-  #"prefix" = e.x.: "IR", "DJI", will go at the begenning of every image 
-   #followed by underscore
+#path name = e.x.: paste(p.raw, "f28.ftrial2", "/" , "E60" , sep = "")
+#should call folder in which files are placed
+#"prefix" = e.x.: "IR", "DJI", will go at the begenning of every image 
+#followed by underscore
 
 
 
@@ -112,7 +116,7 @@ f.rename(paste(p.raw, "test", sep = ""), "IR")
 
 m3.d <- data.frame("NA")
 
- #[i can't get output.name to become a data.frame so it stores properly]
+#[i can't get output.name to become a data.frame so it stores properly]
 
 f.sumflir <- function(dir.path, output.name) {
   
@@ -126,16 +130,16 @@ f.sumflir <- function(dir.path, output.name) {
   for (i in 1:length(im.names)) {
     
     m3.d[i,2] <- substr(file.mtime(paste(p.raw, "m3.outest", "/", 
-                                          im.names[i], sep = "")), 12, 19)
+                                         im.names[i], sep = "")), 12, 19)
   }
   
   #temp object to store matrices w/i loop
-  ma.IR <- "NA"
+  ma.IR <- ("NA")
   
   #create loop that generates, reads and stores info on flir jpegs
   for(i in 1:10) {
     
-    ma.IR <- readflirJPG(paste(dir.path, "/", im.names[i], sep = ""), exiftool.p)
+    ma.IR <- readflirJPG(paste(p.raw, "m3.outest", "/", im.names[1], sep = ""), exiftool.p)
     
     output.name[i, 3] <- min(ma.IR)
     output.name[i, 4] <- max(ma.IR)
