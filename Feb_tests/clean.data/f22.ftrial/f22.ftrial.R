@@ -41,10 +41,10 @@ title(xlab = "Time", ylab = "Temperature (C˚)")
 #save path for the plot if u wanna save
 log_temp.p <- paste(p.cl, "f22.ftrial" ,"log_temp.pdf", sep = "")
 
-#-----imgs-----
+#-----imgs [initial mess]-----
 
 #visualization of one file
-ma.0009 <- readflirJPG(paste(p.raw, "f22.featrial", "/", "DJI_0009.jpg", sep = 
+ma.0009 <- readflirJPG(paste(p.raw, "f22.ftrial", "/", "DJI_0009.jpg", sep = 
                               ""), exiftool.p)
             
 pdf(paste(p.cl, "misc", "/", "hm.0009.pdf", sep = ""), width = 03, height = 03)
@@ -63,8 +63,10 @@ grep("3435", ma.0009) #7895
 
 #I went to make this easier to deal with; I'll try taking the center and then 
   #making part of the standard procedure loop 
-cen.0009 <- ma.0009[((nrow(ma.0009)/2) + 6):((nrow(ma.0009)/2) - 4),
-                    ((ncol(ma.0009)/2) + 25):((ncol(ma.0009)/2) - 40)]
+cen.0009 <- ma.0009[((nrow(ma.0009)/2) + 50):((nrow(ma.0009)/2) - 50),
+                    ((ncol(ma.0009)/2) + 50):((ncol(ma.0009)/2) - 50)]
+
+print(ma.0009[(nrow(ma.0009)/2), (ncol(ma.0009)/2)])
 
 #+/- 30 is all around contains whole platform, good place to start
 #nrow <- +6 / -4 & ncol <- +25 & - 40 captures object itself
@@ -103,3 +105,77 @@ cen.0009[2,63] #has the max signal strength [??? ?? ? ?]
 
 
                                                                                     
+
+#-----imgs [summary] -----
+
+#we still doing f.imgsum manually womp womp
+
+#first generate list of files names
+im.names <- c(list.files(paste(p.raw, "f22.ftrial", sep = "")))
+
+#sometimes there are other files, this step replaces them with NA
+#it does require all file names to be three letters_four numbers
+  #[rename IR to E60]
+
+for (i in 1:length(im.names)){
+  
+  if(substr(im.names[i], 10, 12) != "jpg")
+    (im.names[i] <- NA)
+    
+}
+
+#store into column
+f22.d <- data.frame(im.names)
+
+#generate time stamps for second column
+for (i in 1:length(im.names)) {
+  
+  f22.d[i,2] <- substr(file.mtime(paste(p.raw, "f22.ftrial", "/", 
+                                       im.names[i], sep = "")), 12, 19)
+}
+
+#temp object to store matrices w/i loop
+ma.IR <- ("NA")
+cen.IR <- ("NA")
+
+#create loop that generates, reads and stores info on flir jpegs
+for(i in 1:length(im.names)) {
+  
+  ma.IR <- readflirJPG(paste(p.raw, "f22.ftrial", "/", im.names[i], 
+                             sep = ""), exiftool.p)
+  
+  #for this test we want to specify a smaller area of the image
+  cen.IR <- ma.IR[((nrow(ma.IR)/2) + 50):((nrow(ma.IR)/2) - 50),
+                   ((ncol(ma.IR)/2) + 50):((ncol(ma.IR)/2) - 50)]
+  
+  f22.d[i, 3] <- min(cen.IR)
+  f22.d[i, 4] <- max(cen.IR)
+  f22.d[i, 5] <- mean(cen.IR)
+  
+  #I'm pretty sure for this trial, the center pixel is on the model (when that's 
+    #not the case i need to find a standardized way to identify those pixels)
+  f22.d[i, 6] <- ma.IR[(nrow(ma.IR)/2), (ncol(ma.IR)/2)]
+  
+}
+
+colnames(f22.d) <- c("im.names", "time", "cenmin", "cenmax", "cenmean", "cpxl")
+
+#[really it becomes about defining how many pixels in the view should have a 
+  #certain value (i.e: the model = 20 px so if theres 100 hot px something is 
+  #going on); or even more generally, in a standard noisy scene there are this 
+  #many px of this strength so if there is more we can identify an photo of 
+  #interest; my question is next door neighbor ability]
+
+f22.d_r <- range(f22.d$mean[1:618], f22.d$max[1:618], f22.d$cpxl[1:618])
+
+plot(f22.d$max, type = "o", pch = NA, axes = FALSE, ylim = f22.d_r, 
+     ann = FALSE)
+lines(f22.d$mean)
+lines(f22.d$cpxl)
+
+#[might be able to use the imager package to compare .. ..]
+
+
+
+
+
