@@ -1,5 +1,5 @@
 
-#-----data.logger-----
+#----data.logger-----
 
 #creating minute column for my datalogger data sheet 
 met_min.p <- paste(p.cl, "met_min.csv", sep = "")
@@ -15,7 +15,7 @@ thermtest.d <- read.csv(paste(p.raw, "f22.ftrial", "/", "thermtest.csv", sep = "
          strip.white = TRUE)
 
 #[optional: save plot]
-#pdf(log_temp.p, width = 05, height = 03)
+#pdf(paste(f22.p, "/", "log_temp.pdf", sep = ""), width = 05, height = 03)
 
 #define y range
 time_r <- range(35, thermtest.d$T1, thermtest.d$T2)
@@ -39,9 +39,9 @@ title(xlab = "Time", ylab = "Temperature (C˚)")
 #dev.off()
 
 #save path for the plot if u wanna save
-log_temp.p <- paste(p.cl, "f22.ftrial" ,"log_temp.pdf", sep = "")
+f22.p <- paste(p.cl, "f22.ftrial", sep = "")
 
-#-----imgs [initial mess]-----
+#----imgs [initial mess]-----
 
 #visualization of one file
 ma.0009 <- readflirJPG(paste(p.raw, "f22.ftrial", "/", "DJI_0009.jpg", sep = 
@@ -102,7 +102,7 @@ cen.0009[2,63] #has the max signal strength [??? ?? ? ?]
   #from a square tailored to the object)
 
 
-#-----imgs [summary] -----
+#----imgs [summary] -----
 
 #we still doing f.imgsum manually womp womp
 
@@ -156,18 +156,9 @@ for(i in 1:length(im.names)) {
   
 }
 
+colnames(f22.d) <- c("im_names", "time", "min", "max", "mean", "cenmean")
+
 tail(f22.d)
-
-#I want to build in part of the code that will automatically kick any NAs
-#not sure if has to be number or if "length(im.names)" would work, nrow doesn't
-for (i in 1:620) {
-
-  if(is.na(f22.d$im_names[i]) == TRUE)
-    (f22.d <- f22.d[-i,])
-  
-}
-
-colnames(f22.d) <- c("im_names", "time", "cenmin", "cenmax", "cenmean", "cpxl")
 
 #[really it becomes about defining how many pixels in the view should have a 
   #certain value (i.e: the model = 20 px so if theres 100 hot px something is 
@@ -175,17 +166,62 @@ colnames(f22.d) <- c("im_names", "time", "cenmin", "cenmax", "cenmean", "cpxl")
   #many px of this strength so if there is more we can identify an photo of 
   #interest; my question is next door neighbor ability]
 
-f22.d_r <- range(f22.d$cenmean[5:614], f22.d$cenmax[5:614], f22.d$cpxl[5:614])
+f22.d_r <- range(f22.d$mean, f22.d$max, f22.d$cenmean, f22.d$min)
 
-plot(f22.d$cenmax, type = "o", pch = NA, axes = FALSE, ylim = f22.d_r, 
+#[color lines & make legend]
+
+pdf(paste(f22.p, "/", "scene_signal.pdf", sep = ""), width = 05, height = 03)
+
+plot(f22.d$max, type = "o", pch = NA, axes = FALSE, ylim = f22.d_r, 
      ann = FALSE)
+lines(f22.d$mean)
+lines(f22.d$min)
 lines(f22.d$cenmean)
-lines(f22.d$cpxl)
 
-summary(f22.d$cpxl)
+#ticks represent an hour (every 4 tics is a minute * 60 is an hour)
+axis(1, at = 240 * 0:3, labels = seq(0, 3, 1), lwd.ticks = 0.5)
+#every 100 signal
+axis(2, at = 100 * 0:f22.d_r[2], lwd.ticks = 0.5)
+
+dev.off()
+
+#----check functions----
+
+#I want to build in part of the code that will automatically kick any NAs
+#[right now looks like it needs to be run for each NA...]
+for (i in 1:620) {
+  
+  if(is.na(f22.d$im_names[i]) == TRUE)
+    (f22.d <- f22.d[-i,])
+  
+}
+
+#A start time function would be good, one that removes any data collected b4
+  #an inputted start time
+#[same as na check, it needs to be redone the number of rows that need to be 
+  #removed...]
+
+#for this dataset start time was 14:07:00
+
+for (i in 1:10) {
+  
+  if(f22.d$time[i] < "14:07:00")
+    (f22.d <- f22.d[-i,])
+  
+}
+
+head(f22.d)
+
+#[not ideal but functional]
+
+#I want something that will tell me whether the signal I'm expecting form the 
+  #object/scene is drastically different than expected so i can check those 
+  #files manually
+
+f22.IQR <- summary(f22.d$cenmean)
 
 
-#----checking extracted pixels----
+#----checking extracted pixels[bunk]----
 
 #[I've realized since it's not useful to extract the pixel of the colored 
   #thermal image, however what this code might still be good for extraction of 
@@ -261,4 +297,5 @@ summary(f22.d$cpxl_col)
 
 #[so we could say, if a color pixel falls below the 1st quartile lmk so I can 
   #check the photo w/ my eyeballs]
+
 
