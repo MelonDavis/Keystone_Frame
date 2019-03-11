@@ -102,10 +102,6 @@ cen.0009[2,63] #has the max signal strength [??? ?? ? ?]
   #from a square tailored to the object)
 
 
-
-
-                                                                                    
-
 #-----imgs [summary] -----
 
 #we still doing f.imgsum manually womp womp
@@ -158,7 +154,8 @@ for(i in 1:length(im.names)) {
   
 }
 
-colnames(f22.d) <- c("im.names", "time", "cenmin", "cenmax", "cenmean", "cpxl")
+colnames(f22.d) <- c("im_names", "time", "cenmin", "cenmax", "cenmean", "cpxl",
+                     "cpxl_col", "col2plot")
 
 #[really it becomes about defining how many pixels in the view should have a 
   #certain value (i.e: the model = 20 px so if theres 100 hot px something is 
@@ -166,16 +163,88 @@ colnames(f22.d) <- c("im.names", "time", "cenmin", "cenmax", "cenmean", "cpxl")
   #many px of this strength so if there is more we can identify an photo of 
   #interest; my question is next door neighbor ability]
 
-f22.d_r <- range(f22.d$mean[1:618], f22.d$max[1:618], f22.d$cpxl[1:618])
+f22.d_r <- range(f22.d$cenmean[5:614], f22.d$cenmax[5:614], f22.d$cpxl[5:614])
 
-plot(f22.d$max, type = "o", pch = NA, axes = FALSE, ylim = f22.d_r, 
+plot(f22.d$cenmax, type = "o", pch = NA, axes = FALSE, ylim = f22.d_r, 
      ann = FALSE)
-lines(f22.d$mean)
+lines(f22.d$cenmean)
 lines(f22.d$cpxl)
 
-#[might be able to use the imager package to compare .. ..]
+
+#----checking extracted pixels----
+
+#[might be able to use the imager package to compare which pixels i extracted 
+  #the signal for.. ..]
 
 
+c.0010 <- load.image(paste(p.raw, "f22.ftrial", "/", "DJI_0010.jpg", sep = ""))
+structure(c.0010)
+
+#translate to one channel matrix 
+m.0010 <- grayscale(c.0010) %>% as.matrix
+
+nrow(m.0010)
+ncol(m.0010)
+
+#this is the center pixel
+m.0010[168, 128] #0.67
+
+#looks like it works!
+heatmap(m.0010, Rowv = NA, Colv = NA, col = heat.colors (256), labCol = FALSE, 
+        labRow = FALSE)
+
+#and 0.13 is the mean, 0.0... gets into the black i think so 0.67 makes sense as 
+  #the object (light grey)
+mean(m.0010)
+
+#removed the files that were before start time
+f22.d <- f22.d[-1:-4,]
+head(f22.d)
+
+#so i want to run it and say maybe, if it > 0.5 warn me so I can check it
+#[actually why don't I just print like the first 10-20 rows to see what it'll 
+  #give me]
+
+c.temp <- "NA"
+
+for (i in 1:length(im.names)){
+  
+  c.temp <- load.image(paste(p.raw, "f22.ftrial", "/", im.names[i], 
+                             sep = ""))
+  
+  m.temp <- grayscale(c.temp) %>% as.matrix
+  
+  f22.d[i,7] <- m.temp[168, 128]
+  
+}
+
+#i wanna plot it but i need to make the scales comparable so take it 10 to the 4
+f22.d[,8] <- f22.d$cpxl_col * 1000
+
+#plotting to compare color value
+
+f22.d_r <- range(f22.d$col2plot[5:614], f22.d$cpxl[5:614])
+
+#good they do mirror each other which is what we want [there is a stats test to
+  #confirm this i believe; the test that says how much variance in one data set
+  #can be explained by the variance in another
+plot(f22.d$col2plot, type = "o", pch = NA, axes = FALSE, ylim = f22.d_r, 
+     ann = FALSE)
+lines(f22.d$cpxl)
+
+#the weird part in the begenning for the color value is because humans were in 
+  #the frame which changed the color value (aka its a trash value to take in 
+  #most cases); the good news is I think it is unnessacarry because the same
+  #test/check function should run fine on the signal values; in fact it should 
+  #run exactly the same or better
 
 
+#really I should do a summary statistic to find out the quantile of noise in 
+  #each graph; that can give a standard 
+abline(h = mean(f22.d_r))
+
+summary(f22.d$cpxl_col)
+
+#[so we could say, if a color pixel falls below the 1st quartile lmk so I can 
+  #check the photo w/ my eyeballs]
 
