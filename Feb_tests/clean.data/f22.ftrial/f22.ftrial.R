@@ -150,12 +150,24 @@ for(i in 1:length(im.names)) {
   
   #I'm pretty sure for this trial, the center pixel is on the model (when that's 
     #not the case i need to find a standardized way to identify those pixels)
-  f22.d[i, 6] <- ma.IR[(nrow(ma.IR)/2), (ncol(ma.IR)/2)]
+  f22.d[i, 6] <- mean(ma.IR[((nrow(ma.IR)/2) + 1):((nrow(ma.IR)/2) - 1),
+                            ((ncol(ma.IR)/2) + 1):((ncol(ma.IR)/2) - 1)])
+  
   
 }
 
-colnames(f22.d) <- c("im_names", "time", "cenmin", "cenmax", "cenmean", "cpxl",
-                     "cpxl_col", "col2plot")
+tail(f22.d)
+
+#I want to build in part of the code that will automatically kick any NAs
+#not sure if has to be number or if "length(im.names)" would work, nrow doesn't
+for (i in 1:620) {
+
+  if(is.na(f22.d$im_names[i]) == TRUE)
+    (f22.d <- f22.d[-i,])
+  
+}
+
+colnames(f22.d) <- c("im_names", "time", "cenmin", "cenmax", "cenmean", "cpxl")
 
 #[really it becomes about defining how many pixels in the view should have a 
   #certain value (i.e: the model = 20 px so if theres 100 hot px something is 
@@ -170,11 +182,14 @@ plot(f22.d$cenmax, type = "o", pch = NA, axes = FALSE, ylim = f22.d_r,
 lines(f22.d$cenmean)
 lines(f22.d$cpxl)
 
+summary(f22.d$cpxl)
+
 
 #----checking extracted pixels----
 
-#[might be able to use the imager package to compare which pixels i extracted 
-  #the signal for.. ..]
+#[I've realized since it's not useful to extract the pixel of the colored 
+  #thermal image, however what this code might still be good for extraction of 
+  #corresponding visual RGB pixels/ checking within the signal]
 
 
 c.0010 <- load.image(paste(p.raw, "f22.ftrial", "/", "DJI_0010.jpg", sep = ""))
@@ -237,7 +252,6 @@ lines(f22.d$cpxl)
   #most cases); the good news is I think it is unnessacarry because the same
   #test/check function should run fine on the signal values; in fact it should 
   #run exactly the same or better
-
 
 #really I should do a summary statistic to find out the quantile of noise in 
   #each graph; that can give a standard 
