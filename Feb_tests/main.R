@@ -27,6 +27,9 @@ DJI_set <- flirsettings(paste(p.raw, "f22.ftrial", "/", "DJI_0010.jpg",
 install.packages("imager")
 library(imager)
 
+install.packages("staplr")
+library(staplr)
+
 #===== [FILE MANAGEMENT] =====
 
 #stored names of folders into an object
