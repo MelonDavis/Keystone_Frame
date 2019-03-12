@@ -185,6 +185,17 @@ axis(2, at = 100 * 0:f22.d_r[2], lwd.ticks = 0.5)
 
 dev.off()
 
+#I want to turn these signal values into temperature
+
+#[if the bird models work I can look into generating exact emmissivity from them
+  #before using them in field; I'm just guessing with 0.95]
+
+  f22.d[,7] <- raw2temp(f22.d$cenmean, E = 0.95, OD = 5,
+                        PR1 = DJI_set$Info$PlanckR1, PB = DJI_set$Info$PlanckB, 
+                        PF = DJI_set$Info$PlanckF, PO = DJI_set$Info$PlanckO, 
+                        PR2 = DJI_set$Info$PlanckR2)
+#heck ye !!
+  
 #----check functions----
 
 #I want to build in part of the code that will automatically kick any NAs
@@ -217,16 +228,15 @@ head(f22.d)
 #I want something that will tell me whether the signal I'm expecting form the 
   #object/scene is drastically different than expected so i can check those 
   #files manually
+  #aka -> generate outliers (those 1.5x outside IQR)
 
 f22.IQR <- summary(f22.d$cenmean)
-
 
 #----checking extracted pixels[bunk]----
 
 #[I've realized since it's not useful to extract the pixel of the colored 
   #thermal image, however what this code might still be good for extraction of 
   #corresponding visual RGB pixels/ checking within the signal]
-
 
 c.0010 <- load.image(paste(p.raw, "f22.ftrial", "/", "DJI_0010.jpg", sep = ""))
 structure(c.0010)

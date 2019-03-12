@@ -8,7 +8,7 @@ R.version.string
 #create object of working directory
 working.dir <- getwd()
 
-#download packages
+#===== [PACKAGES] ======
 
 install.packages("Thermimage")
 #call thermimage library
@@ -17,6 +17,12 @@ library(Thermimage)
 exiftool.p <- paste("/usr", "local", "bin/", sep = "/")
 #check it works
 system2(paste(exiftool.p, "exiftool", sep = "/"))
+
+#generate camera settings
+E60_set <- flirsettings(paste(p.raw, "f2.outside", "/", "FLIR1286.jpg", 
+                              sep = ""), exiftool.p, camvals = NULL)
+DJI_set <- flirsettings(paste(p.raw, "f22.ftrial", "/", "DJI_0010.jpg", 
+                              sep = ""), exiftool.p, camvals = NULL)
 
 install.packages("imager")
 library(imager)
