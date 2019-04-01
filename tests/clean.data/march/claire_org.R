@@ -287,8 +287,30 @@ write.csv(m18weath, paste(working.dir, "/", "clean.data/march/",
 #only have from the 12th onwards, only relevent for m13 & m16
   #want to average from last photo taken to 12 hours previous
 
-#m13 - ended at 10:07:26; row 13 = m12 @ 22:00, row 25 = m13 # 10:00
+#translate F˚ into C˚
 m18weath[, 8] <- (m18weath$Temp..F - 32) * 5/9
-        
+colnames(m18weath) <- c("Date","Time.GMT", "Solar.Radiation", "Rain.in", 
+                        "Temp.F", "Rel.Humidity", "Wind.speed", "Temp.C")
+
+#m13 - ended at 10:07:26; row 13 = m12 @ 22:00, row 25 = m13 # 10:00
+m13.weath <- m18weath[13:25,]
+
+summary(m13weath$Temp.C)
+mean(m13weathh$Solar.Radiation)     
+
+write.csv(m13.weath, paste(working.dir, "/", "clean.data/march/",
+                                    "m13weath.csv", sep = ""), 
+                    row.names = FALSE)
+
+#m16 - ended at 15:59:54; row 103 = m16 @ 16:00; 103 - 12 = 91 -> m16 @ 4:00
+m16.weath <- m18weath[91:103,]
+summary(m16.weath$Temp.C)
+mean(m16.weath$Rel.Humidity)
+summary(m16.weath$Solar.Radiation)
+
+write.csv(m16.weath, paste(working.dir, "/", "clean.data/march/",
+                           "m16weath.csv", sep = ""), 
+          row.names = FALSE)
+
 
 
