@@ -1,4 +1,3 @@
-
 #----data.logger-----
 
 #creating minute column for my datalogger data sheet 
@@ -111,7 +110,6 @@ im.names <- c(list.files(paste(p.raw, "f22.ftrial", sep = "")))
 
 #sometimes there are other files, this step replaces them with NA
 #it does require all file names to be three letters_four numbers
-  #[rename IR to E60]
 
 for (i in 1:length(im.names)){
   

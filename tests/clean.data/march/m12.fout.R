@@ -1,1 +1,0 @@
-#bird activity began at 7:00 am or so, sunrise was at 7:31/33
