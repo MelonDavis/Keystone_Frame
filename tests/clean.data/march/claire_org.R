@@ -1,21 +1,21 @@
 #------master overview-----
 
 #call master folder
-#[i need to sort the master data folder so this function is usable]
-master.folder <- paste()
+master.folder <- paste(working.dir, "/raw.data", sep = "")
 
 #list subfolders
 subfolders <- list.files(master.folder)
 
 #names data that will be extracted
 names.overview <- paste("overview.", subfolders, sep = "")
+subfolders[9]
 
 # enter the data.raw folder and loop through different folders in it
 for(i in 1:length(subfolders)){
  
-  #i <- 1
+  #i <- 9
   #make path to each folder
-  p.t <- paste(master.folder , subfolders[i], sep = "" )
+  p.t <- paste(master.folder , "/", subfolders[i], sep = "" )
   #list files in the folder
   list.files.subf <- list.files(p.t)
   

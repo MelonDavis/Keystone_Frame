@@ -61,7 +61,7 @@ ma.IR <- "NA"
 #create loop that generates, reads and stores info on flir jpegs
 for(i in 1:length(im.names)) {
   
-  ma.IR <- readflirJPG(paste(p.raw, "f28.ftrial2", "/", "E60", "/", im.names[i], 
+  ma.IR <- readflirJPG(paste(p.raw, "f28.ftrial2", "/", im.names[i], 
                              sep = ""), exiftool.p)
   f28_60s.d[i, 3] <- min(ma.IR)
   f28_60s.d[i, 4] <- max(ma.IR)
